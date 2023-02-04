@@ -1,0 +1,133 @@
+    1  sudo apt install taskel
+    2  sudo apt install tasksel
+    3  sudo tasksel install ubuntu-desktop
+    4  sudo reboot
+    5  sudo tasksel install ubuntu-desktop
+    6  sudo tasksel install ubuntu desktop
+    7  sudo reboot
+    8  sudo apt-get install ubuntu-desktop
+    9  sudo reboot
+   10  sudo apt install spice-vdagent spice-webdavd
+   11  sudo apt install gcc
+   12  sudo apt install make
+   13  sudo apt-get update
+   14  sudo apt-get install build-essential
+   15  sudo apt install g++
+   16  sudo apt-get update && sudo apt-get install firefox
+   17  firefox
+   18  sudo apt-get --reinstall install firefox
+   19  firefox
+   20  sudo snap remove firefox
+   21  sudo apt install firefox
+   22  sudo snap install firefox
+   23  firefox
+   24  sudo snap remove firefox
+   25  sudo add-apt-repository ppa:mozillateam/ppa
+   26  sudo apt install firefox
+   27  sudo apt remove firefox
+   28  sudo apt purge snapd
+   29  sudo apt install Firefox
+   30  sudo apt install firefox
+   31  firefox
+   32  sudo snap install firefox
+   33  sudo add-apt-repository ppa:mozillateam/ppa
+   34  echo ' Package: * Pin: release o=LP-PPA-mozillateam Pin-Priority: 1001 Package: firefox Pin: version 1:1snap1-0ubuntu2 Pin-Priority: -1 ' | sudo tee /etc/apt/preferences.d/mozilla-firefox
+   35  sudo snap remove firefox
+   36  sudo apt install firefox
+   37  firefox
+   38  echo 'Unattended-Upgrade::Allowed-Origins:: "LP-PPA-mozillateam:${distro_codename}";' | sudo tee /etc/apt/apt.conf.d/51unattended-upgrades-firefox
+   39  firefox
+   40  firefox start
+   41  /usr/bin/firefox
+   42  /usr/bin/firefox &
+   43  snap install firefox
+   44  firefox
+   45  sudo apt remove firefox
+   46  sudo snap remove firefox
+   47  sudo apt install chromium-browser
+   48  chromium
+   49  sudo apt remove chromium-browser
+   50  firefox
+   51  sudo apt install firefox
+   52  firefox
+   53  sudo apt remove firefox
+   54  firefox
+   55  snap remove firefox
+   56  firefox
+   57  sudo apt install firefox
+   58  sudo apt install clion
+   59  sudo apt install spice-vdagent spice-webdavd
+   60  sudo apt install gcc
+   61  sudo apt install make
+   62  kate
+   63  sudo apt install kate
+   64  kate
+   65  sudo snap install kate
+   66  sudo apt remove kate
+   67  sudo snap install kate
+   68  sudo snap install kate --classic
+   69  kate
+   70  /usr/bin/kate
+   71  gcc file testing.c
+   72  .gcc file testing.c
+   73  gcc testing.c
+   74  ./a.out
+   75  gcc 1.15Lab.c
+   76  gcc /home/kimlong12/1.15Lab
+   77  gcc /home/kimlong12/1.15Lab.c
+   78  gcc 1.15Lab.c
+   79  gcc /home/kimlong12/1.15Lab.c
+   80  gcc /home/kimlong12/1.15Lab
+   81  gcc /home/kimlong12/1.15Lab.c
+   82  ./a.out
+   83  gcc 1.16Lab.c
+   84  ./a.out
+   85  ./1.16Lab.out
+   86  gcc 1.17Lab.c
+   87  ./a.out
+   88  gcc 1.17Lab.c
+   89  ./a.out
+   90  gcc 1.17Lab.c
+   91  ./a.out
+   92  gcc 1.17Lab.c
+   93  ./a.out
+   94  gcc 1.17Lab.c
+   95  ./a.out
+   96  gcc 1.17Lab.c
+   97  ./a.out
+   98  gcc 1.17Lab.c
+   99  ./a.out
+  100  gcc 1.18Lab.c
+  101  ./a.out
+  102  gcc 1.18Lab.c
+  103  ./a.out
+  104  gcc 1.19Lab.c
+  105  ./a.out
+  106  gcc 1.20Lab.c
+  107  ./a.out
+  108  gcc 1.20Lab.c
+  109  ./a.out
+  110  gcc 1.20Lab.c
+  111  ./a.out
+  112  gcc 1.15Lab.c
+  113  ./a.out
+  114  ./1.15Lab.out
+  115  ./1.16Lab.out
+  116  ./1.17Lab.out
+  117  ./1.18Lab.out
+  118  ./1.19Lab.out
+  119  ./1.20Lab.out
+  120  pwd
+  121  cd ~
+  122  cd Desktop/
+  123  ls -latr ; mkdir cs149 ; cd cs149
+  124  git init
+  125  git remote add origin https://github.com/KimlongHor/cs149.git
+  126  git config --global user.email "kimlonghor11@gmail.com"
+  127  git config --global user.name "KimlongHor"
+  128  mkdir WS1
+  129  cd WS1
+  130  git add .
+  131  wget -O out.pdf https://tinyurl.com/yy94jltt
+  132  ls -latr
+  133  history > cmds.log
