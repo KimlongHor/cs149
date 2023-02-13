@@ -1,0 +1,40 @@
+  164  gcc 2_25.c
+  165  ./a.out
+  166  gcc 2_25.c
+  167  ./a.out
+  168  gcc 2_29.c
+  169  gcc -o sphere sphere.c -lm
+  170  gcc -o 2_29.c -lm
+  171  gcc 2_29.c
+  172  gcc 2_29.c -o main -lm
+  173  ./main
+  174  gcc 2_29.c -lm
+  175  gcc 2_29.c -o main -lm
+  176  ./main
+  177  gcc 2_29.c -o main -lm
+  178  ./main
+  179  gcc 2_29.c -o main -lm
+  180  ./main
+  181  gcc 2_32.c
+  182  ./a.out
+  183  gcc 2_32.c
+  184  ./a.out
+  185  gcc 2_32.c
+  186  ./a.out
+  187  gcc 2_34.c
+  188  ./a.out
+  189  gcc 2_34.c
+  190  ./a.out
+  191  gcc 3_22.c
+  192  ./a.out
+  193  date
+  194  pwd
+  195  cd ~
+  196  cd Desktop/
+  197  ls -latr  ; mkdir ws2  ; cd ws2
+  198  ls -latr
+  199  echo $?
+  200  man ps
+  201  ps aux
+  202  top
+  203  history > worksheet2.log
