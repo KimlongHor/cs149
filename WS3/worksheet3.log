@@ -1,0 +1,88 @@
+  214  gcc 4_14.c
+  215  ./a.out
+  216  gcc 4_14.c
+  217  ./a.out
+  218  gcc 4_14.c
+  219  ./a.out
+  220  gcc 4_16.c
+  221  ./a.out
+  222  gcc 4_16.c
+  223  ./a.out
+  224  gcc 4_16.c
+  225  ./a.out
+  226  gcc 4_16.c
+  227  ./a.out
+  228  gcc 4_16.c
+  229  ./a.out
+  230  gcc 4_16.c
+  231  ./a.out
+  232  gcc 4_16.c
+  233  ./a.out
+  234  gcc 4_16.c
+  235  ./a.out
+  236  gcc 4_16.c
+  237  ./a.out
+  238  gcc 4_16.c
+  239  ./a.out
+  240  gcc 4_16.c
+  241  ./a.out
+  242  gcc 4_16.c
+  243  ./a.out
+  244  gcc 5_16.c
+  245  ./a.out
+  246  gcc 5_16.c
+  247  ./a.out
+  248  gcc 5_16.c
+  249  ./a.out
+  250  gcc 5_17.c
+  251  ./a.out
+  252  gcc 5_17.c
+  253  ./a.out
+  254  gcc 4_16.c
+  255  ./a.out
+  256  15 20 0 3 -1
+  257  ./a.out
+  258  gcc 5_18.c
+  259  ./a.out
+  260  gcc 5_18.c
+  261  ./a.out
+  262  gcc 5_18.c
+  263  ./a.out
+  264  gcc 5_18.c
+  265  ./a.out
+  266  gcc 5_18.c
+  267  ./a.out
+  268  gcc 5_18.c
+  269  ./a.out
+  270  gcc 5_18.c
+  271  ./a.out
+  272  gcc 5_18.c
+  273  ./a.out
+  274  gcc 5_21.c
+  275  ./a.out
+  276  gcc 5_21.c
+  277  ./a.out
+  278  gcc 5_21.c
+  279  ./a.out
+  280  gcc 5_21.c
+  281  ./a.out
+  282  gcc 5_22.c
+  283  ./a.out
+  284  gcc 5_22.c
+  285  ./a.out
+  286  gcc 5_23.c
+  287  ./a.out
+  288  gcc 5_23.c
+  289  ./a.out
+  290  wget https://github.com/torvalds/linux/archive/master.zip
+  291  cd linux-master
+  292  cd master
+  293  cd linux-master/
+  294  pwd
+  295  alias l='ls -latr'
+  296  l
+  297  find . -name mem.c
+  298  find . -name mem.c | xargs head
+  299  find . -name mem.c | xargs grep 86
+  300  cd ..
+  301  history > worksheet3.log 
