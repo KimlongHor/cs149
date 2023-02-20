@@ -6,14 +6,17 @@
  * Creation date: 02/19/2023
  **/
  
- // NEXT STEP: I should find a way to take a file as a parameter in the terminal.
- 
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
  
- int main(void) {
+ /*
+ parameters:
+ - argc is the number of parameters
+ - argv is the pointer to all parameters.
+ */
+ int main(int argc, char **argv) {
  	char names[100][30] = {0};
  	int numOfUniqueNames = 0;
  	int nameCounts[100] = {0};
@@ -21,7 +24,8 @@
  	bool isExisted = false;
  	int curLineInFile = 0;
  	
- 	FILE *fp = fopen("names.txt", "r");
+ 	// In this case, argv[1] = "names.txt"
+ 	FILE *fp = fopen(argv[1], "r");
  	
  	if (fp == NULL) {
  		printf("Cannot open file.\n");
@@ -29,6 +33,7 @@
  	}
  	
  	while (fgets(curName, 100, fp) != NULL) {
+ 		// keeps track of the line we are reading in the file 
  		curLineInFile += 1;
  		
  		// if the current line contains only "\n", skip
@@ -50,6 +55,7 @@
  			}
  		}
  		
+ 		// if the name does not exist in the array, append it to the array and increment the name count
  		if (isExisted == false) {
  			strcpy(names[numOfUniqueNames], curName);
  			nameCounts[numOfUniqueNames] = 1;
