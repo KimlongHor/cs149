@@ -12,9 +12,12 @@
 #include <string.h>
  
  /*
- parameters:
+ This function counts the names in a given file.
+ Assumption: There are less than 100 unique names in the given file and each name has less than 30 characters.
+ Inputs:
  - argc is the number of parameters
  - argv is the pointer to all parameters.
+ Return: an integer
  */
  int main(int argc, char **argv) {
  	char names[100][30] = {0};
@@ -65,6 +68,7 @@
  		isExisted = false;
  	}
  	
+ 	// print the names and its counts
  	for (int i = 0; i < numOfUniqueNames; i++) {
  		printf("%s : %d\n", names[i], nameCounts[i]);
  	}
