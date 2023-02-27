@@ -1,0 +1,30 @@
+  430  gcc 6_20.c
+  431  ./a.out
+  432  gcc 6_20.c
+  433  ./a.out
+  434  gcc 6_20.c
+  435  ./a.out
+  436  gcc 6_20.c
+  437  ./a.out
+  438  gcc 6_30.c
+  439  ./a.out
+  440  gcc 6_30.c
+  441  ./a.out
+  442  wget http://www.apuebook.com/src.3e.tar.gz
+  443  gunzip src.3e.tar.gz
+  444  tar xvf src.3e.tar
+  445  cd apue.3e
+  446  cd [roc
+  447  cd proc
+  448  make all
+  449  ./fork1
+  450  ./fork2
+  451  pwd 
+  452  pstree
+  453  ps -a -f -x
+  454  ps -a -f -x | more
+  455  top
+  456  man kill
+  457  echo $?
+  458  echo $$
+  459  history > worksheet4.log
