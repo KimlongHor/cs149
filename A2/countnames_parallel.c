@@ -18,10 +18,18 @@ typedef struct my_data {
   int count;
 } my_data;
 
-void countName(char filename[]) {
-	my_data namecounts[100]={ { '\0', 0 } };
+ /*
+ This function counts the names in a given file.
+ Assumption: There are less than 100 unique names in the given file and each name has less than 30 characters.
+ Inputs:
+ - filename: an array of characters
+ - *namecounts: a pointer to the my_data struct
+ Return: an integer
+ */
+int countName(char filename[], struct my_data *namecounts) {
+	
+	int numOfUniqueNames = 0;
 	char names[100][30] = {0};
- 	int numOfUniqueNames = 0;
  	int nameCounts[100] = {0};
  	char curName[100];
  	bool isExisted = false;
@@ -30,7 +38,7 @@ void countName(char filename[]) {
  	FILE *fp = fopen(filename, "r");
  	
  	if (fp == NULL) {
- 		printf("Cannot open file.\n");
+ 		fprintf(stderr, "range: cannot open file: %s\n", filename);
  		exit(1);
  	}
  	
@@ -40,7 +48,7 @@ void countName(char filename[]) {
  		
  		// if the current line contains only "\n", skip
  		if (strcmp(curName, "\n") == 0) {
- 			fprintf(stderr, "Warning - Line %d is empty\n", curLineInFile);
+ 			fprintf(stderr, "Warning - file %s line %d is empty\n", filename, curLineInFile);
  			continue;
  		}
  		
@@ -67,38 +75,105 @@ void countName(char filename[]) {
  		isExisted = false;
  	}
  	
- 	// print the names and its counts
- 	for (int i = 0; i < numOfUniqueNames; i++) {
- 		printf("%s : %d\n", namecounts[i].name, namecounts[i].count);
- 	}
- 	
  	fclose(fp);
+ 	return numOfUniqueNames;
 }
 
+
+ /*
+ This function counts the names in one or more files.
+ Assumption: There are less than 100 unique names in the given file and each name has less than 30 characters.
+ Inputs:
+ - argc is the number of parameters
+ - argv is the pointer to all parameters.
+ Return: an integer
+ */
 int main (int argc, char **argv) {
 	char *curFileName;
-	my_data namecounts[100]={ { '\0', 0 } };
+	my_data totalnamecounts[100]={ { '\0', 0 } };
+	int totalNumOfUniqueNames = 0;
+	int pfds[argc - 1][2];
+	int pid = 0;
 	
+	if (argv == NULL) {
+		exit(0);
+	}
 	
+	// this loop is for creating pipes and child processes depending on number of files given in the paramter
 	for (int i = 1; i < argc; i++) {
-		printf("Filename: %s\n", argv[i]);
 		curFileName = argv[i];
-		int childid = fork();
-		if (childid == 0) {
-			printf("Current PID: %d\n", getpid());
-			countName(curFileName);
-			exit(0);
-		} else if (childid > 0){
-			wait(NULL);
+		pipe(pfds[i - 1]);
+		pid = fork();
+		
+		// in child process
+		if (pid == 0) {
+			my_data namecounts[100]={ { '\0', 0 } };
+			int numOfUniqueNames = 0;
+			
+			if (fopen(curFileName, "r") == NULL) {
+				fprintf(stderr, "range: cannot open file: %s\n", curFileName);
+				
+				// Pass information to parent process
+				write(pfds[i-1][1], namecounts, sizeof(my_data) * 100);
+				write(pfds[i-1][1], &numOfUniqueNames, sizeof(numOfUniqueNames));
+				close(pfds[i-1][1]);
+				exit(1);
+			} else {
+				// Find number of unique names in a file and update the namecounts variable
+				numOfUniqueNames = countName(curFileName, namecounts);
+			
+				// Pass information to parent process
+				write(pfds[i-1][1], namecounts, sizeof(my_data) * 100);
+				write(pfds[i-1][1], &numOfUniqueNames, sizeof(numOfUniqueNames));
+				close(pfds[i-1][1]);
+				exit(0);
+			}
+			
+		} else if (pid < 0) {
+			fprintf(stderr, "Failed to fork");
 		}
 	}
 	
+	int pipeCount = 0;
+	
+	// this loop is for getting the information from child process and update the value in totalnamecounts
+	while (wait(NULL) != -1) {
+		my_data namecounts[100]={ { '\0', 0 } };
+		int numOfUniqueNames = 0;
+		
+		// Read information passed from child process
+		read(pfds[pipeCount][0], namecounts, sizeof(my_data) * 100);
+		read(pfds[pipeCount][0], &numOfUniqueNames, sizeof(numOfUniqueNames));
+		close(pfds[pipeCount][0]);
+		
+		// loop through number of unique names passed from child process
+		for (int j = 0; j < numOfUniqueNames; j++) {
+			bool isExisted = false;
+			
+			// this loop is for checking if the name exist in totalnamecounts
+			for (int i = 0; i < totalNumOfUniqueNames; i++) {	
+	 			if (strcmp(totalnamecounts[i].name, namecounts[j].name) == 0) {
+	 				isExisted = true;
+	 				totalnamecounts[i].count += 1;
+	 			}
+	 		}
+	 		
+	 		// if the name does not exist in the array, append it to the array and increment the name count
+	 		if (isExisted == false) {
+	 			strcpy(totalnamecounts[totalNumOfUniqueNames].name, namecounts[j].name);
+	 			totalnamecounts[totalNumOfUniqueNames].count = namecounts[j].count;
+	 			totalNumOfUniqueNames += 1;
+	 		}
+		}
+		// increment to the next pipe
+		pipeCount++;
+	}
+	
+	// print the names and its counts
+ 	for (int i = 0; i < totalNumOfUniqueNames; i++) {
+ 		printf("%s : %d\n", totalnamecounts[i].name, totalnamecounts[i].count);
+ 	}
+	
 	return 0;
 }
-
-/*
-Plan: 
-- Use pipe to pass namecounts from child to parent.
-- Find a way to check if all childs check each file concurrently.
-*/
 
