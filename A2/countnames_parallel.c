@@ -29,8 +29,6 @@ typedef struct my_data {
 int countName(char filename[], struct my_data *namecounts) {
 	
 	int numOfUniqueNames = 0;
-	char names[100][30] = {0};
- 	int nameCounts[100] = {0};
  	char curName[100];
  	bool isExisted = false;
  	int curLineInFile = 0;
@@ -90,7 +88,7 @@ int countName(char filename[], struct my_data *namecounts) {
  */
 int main (int argc, char **argv) {
 	char *curFileName;
-	my_data totalnamecounts[100]={ { '\0', 0 } };
+	my_data totalnamecounts[100]={{{'\0', 0 }}};
 	int totalNumOfUniqueNames = 0;
 	int pfds[argc - 1][2];
 	int pid = 0;
@@ -107,7 +105,7 @@ int main (int argc, char **argv) {
 		
 		// in child process
 		if (pid == 0) {
-			my_data namecounts[100]={ { '\0', 0 } };
+			my_data namecounts[100]={{{ '\0', 0 }}};
 			int numOfUniqueNames = 0;
 			
 			if (fopen(curFileName, "r") == NULL) {
@@ -138,7 +136,7 @@ int main (int argc, char **argv) {
 	
 	// this loop is for getting the information from child process and update the value in totalnamecounts
 	while (wait(NULL) != -1) {
-		my_data namecounts[100]={ { '\0', 0 } };
+		my_data namecounts[100]={{{ '\0', 0 }}};
 		int numOfUniqueNames = 0;
 		
 		// Read information passed from child process
