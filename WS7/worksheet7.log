@@ -1,0 +1,30 @@
+  718  gcc 6_24.c
+  719  ./a.out
+  720  gcc 6_24.c
+  721  ./a.out
+  722  gcc 6_24.c
+  723  ./a.out
+  724  gcc -o lseek_example lseek_example.c"
+  725  gcc -o lseek_example lseek_example.c
+  726  ./lseek.example
+  727  ./lseek_example
+  728  gcc -o lseek_example lseek_example.c
+  729  ./lseek_example
+  730  gcc -o lseek_example lseek_example.c
+  731  ./lseek_example
+  732  gcc -o lseek_example lseek_example.c
+  733  ./lseek_example
+  734  gcc -o lseek_example lseek_example.c
+  735  ./lseek_example
+  736  cd ~/Desktop/
+  737  mkdir ws7
+  738  cd ws7
+  739  ls | wc
+  740  ls | sort
+  741  ls | sort | wc
+  742  ls -latr /bin/ > a.out
+  743  cat a.out | more
+  744  strace ls
+  745  du -sh .
+  746  df -i
+  747  history > worksheet7.log
