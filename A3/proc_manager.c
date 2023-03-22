@@ -42,7 +42,7 @@
  			char errorFile[100];
  			
  			sprintf(outputFile, "%d.out", getpid());
- 			sprintf(errorFile, "%d.out", getpid());
+ 			sprintf(errorFile, "%d.err", getpid());
  			
  			int outputFd = open(outputFile, O_RDWR | O_CREAT | O_APPEND, 0777);
  			int errorFd = open(errorFile, O_RDWR | O_CREAT | O_APPEND, 0777);
@@ -57,20 +57,49 @@
  				exit(1);
  			}
  			
- 			if(dup2(outputFd, 1) < 0) {
+ 			if(dup2(outputFd, STDOUT_FILENO) < 0) {
  				perror("Failed dup2 for outputFd");
  				exit(2);
  			}
- 			close(outputFd);
  			
- 			if(dup2(errorFd, 2) < 0) {
+ 			if(dup2(errorFd, STDERR_FILENO) < 0) {
  				perror("Failed dup2 for errorFd");
  				exit(2);
  			}
+ 
+ 			fprintf(stdout, "Starting command %d: child %d pid of parent %d\n", i+1, getpid(), getppid());		
+ 			close(outputFd);
  			close(errorFd);
- 			
- 			printf("Starting command %d: child %d pid of parent %d", i, getpid(), getppid());		
+ 			exit(0);
  		}
+ 	}
+ 	
+ 	int status;
+ 	
+ 	// In parent process
+ 	while((pid = wait(&status)) > 0) {
+ 		char outputFile[100];
+		char errorFile[100];
+		
+		sprintf(outputFile, "%d.out", pid);
+		sprintf(errorFile, "%d.err", pid);
+		
+		FILE *outFile = fopen(outputFile, "a");
+		FILE *errFile = fopen(errorFile, "a");
+		
+		fprintf(outFile, "Finish child %d pid of parent %d\n", pid, getpid());
+		
+		if (WIFSIGNALED(status))
+        	{
+            		fprintf(errFile, "Killed with signal %d", WTERMSIG(status));
+        	}
+		else
+		{
+		   	fprintf(errFile, "Exited with exitcode = %d", WEXITSTATUS(status));
+		}
+		
+		fclose(outFile);
+		fclose(errFile);
  	}
  	
  	return 0;
