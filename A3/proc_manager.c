@@ -57,20 +57,42 @@
  				exit(1);
  			}
  			
- 			if(dup2(outputFd, STDOUT_FILENO) < 0) {
+ 			if(dup2(outputFd, 1) < 0) {
  				perror("Failed dup2 for outputFd");
  				exit(2);
  			}
  			
- 			if(dup2(errorFd, STDERR_FILENO) < 0) {
+ 			if(dup2(errorFd, 2) < 0) {
  				perror("Failed dup2 for errorFd");
  				exit(2);
  			}
  
- 			fprintf(stdout, "Starting command %d: child %d pid of parent %d\n", i+1, getpid(), getppid());		
+ 			printf("Starting command %d: child %d pid of parent %d\n", i+1, getpid(), getppid());
+ 			fflush(STDIN_FILENO);
+ 			
  			close(outputFd);
  			close(errorFd);
- 			exit(0);
+ 			
+ 			// set up commands
+ 			char *arg[MAX_LENGTH];
+ 			int argCount = 0;
+ 			arg[argCount] = strtok(command[i], " ");
+ 			
+ 			while (arg[argCount] != NULL) {
+ 				argCount++;
+ 				arg[argCount] = strtok(NULL, " ");
+ 			}
+ 			
+ 			arg[argCount+1] = NULL;
+ 			
+ 			for(int i = 0; i <= argCount; i++) {
+ 				printf("HERE: %d => %s", i, arg[i]);
+ 			}
+ 			
+ 			if (execvp(arg[0], arg) < 0) {
+ 				perror("Failed execvp");
+ 				exit(2);
+ 			}
  		}
  	}
  	
@@ -89,13 +111,14 @@
 		
 		fprintf(outFile, "Finish child %d pid of parent %d\n", pid, getpid());
 		
-		if (WIFSIGNALED(status))
+		if (WIFEXITED(status))
         	{
-            		fprintf(errFile, "Killed with signal %d", WTERMSIG(status));
+            		fprintf(errFile, "Exited with exitcode = %d", WEXITSTATUS(status));
         	}
-		else
+		else if (WIFSIGNALED(status))
 		{
-		   	fprintf(errFile, "Exited with exitcode = %d", WEXITSTATUS(status));
+			fprintf(errFile, "Killed with signal %d", WTERMSIG(status));
+		   	
 		}
 		
 		fclose(outFile);
