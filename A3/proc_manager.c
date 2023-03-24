@@ -18,7 +18,7 @@
  
  int main(void) {
  	char command[MAX_NUM_COMMAND][MAX_LENGTH];
- 	char numOfCommand = 0;
+ 	unsigned char numOfCommand = 0;
  	int pid = 0;
  	
  	// This while loop read all command line until control-d and store them in an array
