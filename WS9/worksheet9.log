@@ -1,0 +1,38 @@
+  894  gcc 9_5.c 
+  895  ./a.out 
+  896  gcc 9_5.c 
+  897  ./a.out 
+  898  gcc 9_5.c 
+  899  ./a.out 
+  900  gcc 9_5.c 
+  901  ./a.out 
+  902  gcc 9_5.c 
+  903  ./a.out 
+  904  gcc 9_5.c 
+  905  ./a.out 
+  906  gcc 9_5.c 
+  907  ./a.out 
+  908  gcc 9_5.c 
+  909  ./a.out 
+  910  gcc 9_5.c 
+  911  ./a.out 
+  912  gcc 9_5.c 
+  913  ./a.out 
+  914  gcc 9_5.c 
+  915  ./a.out 
+  916  gcc 9_5.c 
+  917  ./a.out 
+  918  gcc 9_5.c 
+  919  ./a.out 
+  920  gcc 9_5.c 
+  921  ./a.out 
+  922  gcc 9_5.c 
+  923  ./a.out 
+  924  cd '/home/kimlong12/apue.3e/signals' 
+  925  make all
+  926  ./sigusr &
+  927  kill -SIGUSR1 3294
+  928  kill -SIGUSR2 3294
+  929  kill -SIGCONT 3294
+  930  kill -9 3294
+  931  history > worksheet9.log
