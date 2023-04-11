@@ -224,6 +224,9 @@ char** initArray(int size) {
 char** resize(char** array, int size) {
 	PUSH_TRACE("resize");
 	array = realloc(array, size * sizeof(char*));
+	for (int i = size - 10; i < size; i++) {
+		array[i] = malloc(100 * sizeof(char));
+	}
 	POP_TRACE();
 	return array;
 }
@@ -237,8 +240,32 @@ void freeArray(char** array, int size) {
 	POP_TRACE();
 }
 
+int dupOutput() {
+	PUSH_TRACE("dupOutput");
+	char* outputFile = "memtrace.out";
+	int outputFd = open(outputFile, O_RDWR | O_CREAT, 0777);
+	if (outputFd < 0) {
+		perror("Failed opening output file.");
+		exit(1);
+	}
+	
+	// duplicate outputFd into stdout which is 1
+	if(dup2(outputFd, 1) < 0) {
+		perror("Failed dup2 for outputFd");
+		exit(2);
+	}
+	close(outputFd);
+	POP_TRACE();
+	return 0;
+}
+
 int main(void) {
 	PUSH_TRACE("main");
+	
+	// set up output to the memtrace.out file
+	if(dupOutput() != 0) {
+		exit(1);
+	}
 	
 	char* input = NULL;
 	size_t inputLength = 0;
