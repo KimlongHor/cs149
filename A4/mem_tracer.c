@@ -1,5 +1,5 @@
 /**
- * Description: This program
+ * Description: This program takes string commands as an input and store them in a dynamic allocated array and a linkedlist. It also has memory tracing implemented to keep track of allocated and deallocated memory.
  * Author names: Kimlong Hor, Jimmy Phan
  * Author emails: kimlong.hor@sjsu.edu, jimmy.phan@sjsu.edu
  * Last modified date: 04/10/2023
@@ -157,25 +157,38 @@ void FREE(void* p,char* file,int line)
 
 /*<------------------------------------------------------------------------>*/
 
-// Define LinkedList and its node structs
+// Define node structs for linkedlist
 typedef struct Node {
     	char* data;
     	int index;
     	struct Node* next;
 } Node;
 
+// Define linkedlist struct
 typedef struct LinkedList {
 	Node *head;
 } LinkedList;
 
+ /*
+ This function allocates memory for a new linkedlist
+ Assumption: None
+ Inputs: None
+ Return: a linkedlist pointer
+ */
 LinkedList* initLinkedList() {
 	PUSH_TRACE("initLinkedList");
 	LinkedList* list = malloc(sizeof(LinkedList));
-	list->head = malloc(sizeof(Node));
+	list->head = NULL;
 	POP_TRACE();
 	return list;
 }
 
+ /*
+ This function allocates new memory for a new linkedlist node
+ Assumption: None
+ Inputs: a char pointer and an integer
+ Return: a node pointer
+ */
 Node* createNewNode(char* data, int index) {
 	PUSH_TRACE("createNewNode");
 	Node* node = malloc(sizeof(Node));
@@ -185,6 +198,12 @@ Node* createNewNode(char* data, int index) {
 	return node;
 }
 
+ /*
+ This function frees the allocated memory for a linkedlist
+ Assumption: None
+ Inputs: a linkedlist pointer
+ Return: void
+ */
 void freeLinkedList(LinkedList* list) {
 	PUSH_TRACE("freeLinkedList");
 	Node* current = list->head;
@@ -200,6 +219,12 @@ void freeLinkedList(LinkedList* list) {
 	POP_TRACE();
 }
 
+ /*
+ This function prints out the content in a linkedlist recursively
+ Assumption: None
+ Inputs: a node pointer
+ Return: void
+ */
 void PrintNodes(Node *head) {
 	PUSH_TRACE("PrintNodes");
 	if (head == NULL) {
@@ -211,6 +236,12 @@ void PrintNodes(Node *head) {
 	POP_TRACE();
 }
 
+ /*
+ This function allocates new memory for a new created array
+ Assumption: each command is less than 100 characters
+ Inputs: an integer
+ Return: a double char pointer
+ */
 char** initArray(int size) {
 	PUSH_TRACE("initArray");
 	char** a = malloc(size * sizeof(char*));
@@ -221,6 +252,12 @@ char** initArray(int size) {
 	return a;
 }
 
+ /*
+ This function reallocates memory for a bigger size array
+ Assumption: each command is less than 100 characters
+ Inputs: a double char pointer and an integer
+ Return: a double char pointer
+ */
 char** resize(char** array, int size) {
 	PUSH_TRACE("resize");
 	array = realloc(array, size * sizeof(char*));
@@ -231,6 +268,12 @@ char** resize(char** array, int size) {
 	return array;
 }
 
+ /*
+ This function frees the memory of an array
+ Assumption: None
+ Inputs: a double char pointer and an integer
+ Return: void
+ */
 void freeArray(char** array, int size) {
 	PUSH_TRACE("freeArray");
 	for(int i = 0; i < size; i++) {
@@ -240,6 +283,12 @@ void freeArray(char** array, int size) {
 	POP_TRACE();
 }
 
+ /*
+ This function redirects the output to an output file "memtrace.out"
+ Assumption: None
+ Inputs: None
+ Return: an integer
+ */
 int dupOutput() {
 	PUSH_TRACE("dupOutput");
 	char* outputFile = "memtrace.out";
@@ -275,8 +324,9 @@ int main(void) {
 	char** inputArray = initArray(allocatedSize);
 	
 	LinkedList *list = initLinkedList();
-	Node *currentNode = list->head;
+	Node *currentNode = NULL;
 	
+	// get the input
 	while (getline(&input, &inputLength, stdin) != -1) {
 		
 		// check if inputArray needs to be resized to get more space
@@ -287,10 +337,10 @@ int main(void) {
 		}
 		
 		// copy input into the inputArray and the linkedlink
-		inputArray[inputCount] = strdup(input);
+		strcpy(inputArray[inputCount], input);
 		if (inputCount == 0) {
-			list->head->data = strdup(inputArray[inputCount]);
-			list->head->index = inputCount + 1;
+			list->head = createNewNode(inputArray[inputCount], inputCount + 1);
+			currentNode = list->head;
 		} else {
 			currentNode->next = createNewNode(inputArray[inputCount], inputCount + 1);
 			currentNode = currentNode->next;
