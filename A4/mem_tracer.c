@@ -214,6 +214,9 @@ void PrintNodes(Node *head) {
 char** initArray(int size) {
 	PUSH_TRACE("initArray");
 	char** a = malloc(size * sizeof(char*));
+	for (int i = 0; i < size; i++) {
+		a[i] = malloc(100 * sizeof(char));
+	}
 	POP_TRACE();
 	return a;
 }
@@ -259,7 +262,7 @@ int main(void) {
 		// copy input into the inputArray and the linkedlink
 		inputArray[inputCount] = strdup(input);
 		if (inputCount == 0) {
-			list->head->data = inputArray[inputCount];
+			list->head->data = strdup(inputArray[inputCount]);
 			list->head->index = inputCount + 1;
 		} else {
 			currentNode->next = createNewNode(inputArray[inputCount], inputCount + 1);
@@ -269,11 +272,12 @@ int main(void) {
  	}
  	
  	free(input);
+ 	currentNode->next = NULL;
+ 	currentNode = NULL;
  	
  	PrintNodes(list->head);
  	freeLinkedList(list);
  	
- 	free(currentNode);
  	freeArray(inputArray, allocatedSize);
 	
 	POP_TRACE();
