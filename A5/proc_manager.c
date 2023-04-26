@@ -246,6 +246,77 @@ int main(void) {
  	
  	freeArray(inputArray, allocatedSize);
  	
-
+ 	int status;
+ 	
+ 	// In parent process
+ 	while((pid = wait(&status)) > 0) {
+ 		clock_gettime(CLOCK_MONOTONIC, &finishtime);
+ 		
+ 		redirectOutputToFiles(pid);
+		
+		// check the status and write a message to error file accordingly
+		if (WIFEXITED(status)) {
+            		fprintf(stderr, "Exited with exitcode = %d", WEXITSTATUS(status));
+        	}
+		else if (WIFSIGNALED(status)) {
+			fprintf(stderr, "Killed with signal %d", WTERMSIG(status));
+		}
+		
+		struct nlist* curNp = lookup(pid);
+ 		if (curNp == NULL) {
+			perror("Failed to inserting new node");
+		}
+		curNp->finishtime = finishtime;
+		
+		double elapsed = curNp->finishtime.tv_sec - curNp->starttime.tv_sec;
+		
+		fprintf(stdout, "Finished at %ld, runtime duration %f\n", curNp->finishtime.tv_sec, elapsed);
+		fflush(STDIN_FILENO);
+		
+		if (elapsed <= 2) {
+			fprintf(stderr, "spawning too fast\n");
+		} else {
+			clock_gettime(CLOCK_MONOTONIC, &starttime);
+			// create a child process
+	 		pid = fork();
+	 		
+	 		if (pid < 0) { // if fork() fails
+	 			fprintf(stderr, "Failed to fork");
+	 			exit(2);
+	 		} else if (pid == 0) { // child process
+	 			redirectOutputToFiles(getpid());
+	 			printf("RESTARTING");
+	 			printf("Starting command %d: child %d pid of parent %d\n", curNp->index, getpid(), getppid());
+	 			
+	 			// clean buffer. Without this, the [pid].out will be overwritten by the execvp result
+	 			fflush(STDIN_FILENO);
+	 			
+	 			// set up commands
+	 			char *arg[strlen(curNp->command) + 1];
+	 			int argCount = 0;
+	 			arg[argCount] = strtok(curNp->command, " ");
+	 			
+	 			while (arg[argCount] != NULL) {
+	 				argCount++;
+	 				arg[argCount] = strtok(NULL, " ");
+	 			}
+	 			
+	 			arg[argCount+1] = NULL;
+	 			
+	 			// execute the command using execvp
+	 			if (execvp(arg[0], arg) < 0) {
+	 				perror("Failed execvp");
+	 				exit(2);
+	 			}
+	 			
+	 		} else if (pid > 0) {  /* parent goes to the next node */ 
+	 			curNp = insert(curNp->command, pid, curNp->index);
+	 			if (np == NULL) {
+	 				perror("Failed to inserting new node");
+	 			}
+	 			curNp->starttime = starttime;
+			}
+		}
+ 	}
 	return 0;
 }
