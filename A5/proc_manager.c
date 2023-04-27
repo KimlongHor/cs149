@@ -1,12 +1,12 @@
 /**
- * Description: 
+ * Description: The program takes commands as an input, stores them in a hashtable and an array, and execute them in child processes.
  * Author names: Kimlong Hor, Jimmy Phan
  * Author emails: kimlong.hor@sjsu.edu, jimmy.phan@sjsu.edu
- * Last modified date: 04/25/2023
+ * Last modified date: 04/26/2023
  * Creation date: 04/22/2023
  **/
  
- #include <stdio.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
@@ -34,7 +34,7 @@ unsigned hash(int pid) {
 	return hashval % HASHSIZE;
 }
 
-/* lookup: look for s in hashtab */
+/* This function look for a node in hashtab */
 /* This is traversing the linked list under a slot of the hash table. The array position to look in is returned by the hash function */
 struct nlist *lookup(int pid) {
 	struct nlist *np;
@@ -45,11 +45,11 @@ struct nlist *lookup(int pid) {
 	return NULL; /* not found */
 }
 
-/** You might need to duplicate the command string to ensure you
-don't overwrite the previous command each time a new line is read
-from the input file.
-Or you might not need to duplicate it. It depends on your
-implementation. **/
+/* This function duplicates the string
+ Assumption: None
+ Inputs: a character pointer
+ Return: a character pointer
+*/
 char *stringdup(char *s) /* make a duplicate of s */
 {
 	char *p;
@@ -59,7 +59,6 @@ char *stringdup(char *s) /* make a duplicate of s */
 	return p;
 }
 
-/* insert: put (name, defn) in hashtab */
 /* This insert returns a nlist node. Thus when you call insert in
 your main function */
 /* you will save the returned nlist node in a variable (mynode).
@@ -133,6 +132,9 @@ void freeArray(char** array, int size) {
 
 /*
 This function redirect outputs for files
+Assumption: None
+Inputs: an integer
+Return: void
 */
 void redirectOutputToFiles(int pid) {
 	char outputFile[100];
@@ -147,25 +149,45 @@ void redirectOutputToFiles(int pid) {
 	int errorFd = open(errorFile, O_RDWR | O_CREAT | O_APPEND, 0777);
 	
 	if (outputFd < 0) {
-		perror("Failed opening output file.");
+		perror("Failed opening output file.\n");
 		exit(1);
 	}
 	
 	if (errorFd < 0) {
-		perror("Failed opening error file.");
+		perror("Failed opening error file.\n");
 		exit(1);
 	}
 	
 	// duplicate outputFd into stdout which is 1
 	if(dup2(outputFd, 1) < 0) {
-		perror("Failed dup2 for outputFd");
+		perror("Failed dup2 for outputFd\n");
 		exit(2);
 	}
 	
 	// duplicate errorFd into stderr which is 2
 	if(dup2(errorFd, 2) < 0) {
-		perror("Failed dup2 for errorFd");
+		perror("Failed dup2 for errorFd\n");
 		exit(2);
+	}
+}
+
+
+/*
+ This function frees the memory of a hashtable
+ Assumption: None
+ Inputs: None
+ Return: void
+ */
+void freeHashTable() {
+	for (int i = 0; i < HASHSIZE; i++) {
+		struct nlist *cur = hashtab[i];
+		while(cur != NULL) {			// free the entire hash chain
+		    	struct nlist* next = cur->next;
+			free(cur->command);
+			free(cur);
+			cur = next;
+		}
+		hashtab[i] = NULL;
 	}
 }
 
@@ -208,7 +230,7 @@ int main(void) {
  		pid = fork();
  		
  		if (pid < 0) { // if fork() fails
- 			fprintf(stderr, "Failed to fork");
+ 			fprintf(stderr, "Failed to fork\n");
  			exit(2);
  		} else if (pid == 0) { // child process
  			redirectOutputToFiles(getpid());
@@ -231,14 +253,14 @@ int main(void) {
  			
  			// execute the command using execvp
  			if (execvp(arg[0], arg) < 0) {
- 				perror("Failed execvp");
+ 				perror("Failed execvp\n");
  				exit(2);
  			}
  			
  		} else if (pid > 0) {  /* parent goes to the next node */ 
  			np = insert(inputArray[i], pid, i + 1);
  			if (np == NULL) {
- 				perror("Failed to inserting new node");
+ 				perror("Failed to inserting new node\n");
  			}
  			np->starttime = starttime;
 		}
@@ -256,21 +278,22 @@ int main(void) {
 		
 		// check the status and write a message to error file accordingly
 		if (WIFEXITED(status)) {
-            		fprintf(stderr, "Exited with exitcode = %d", WEXITSTATUS(status));
+            		fprintf(stderr, "Exited with exitcode = %d\n", WEXITSTATUS(status));
         	}
 		else if (WIFSIGNALED(status)) {
-			fprintf(stderr, "Killed with signal %d", WTERMSIG(status));
+			fprintf(stderr, "Killed with signal %d\n", WTERMSIG(status));
 		}
 		
 		struct nlist* curNp = lookup(pid);
  		if (curNp == NULL) {
-			perror("Failed to inserting new node");
+			perror("Failed to inserting new node\n");
 		}
 		curNp->finishtime = finishtime;
 		
 		double elapsed = curNp->finishtime.tv_sec - curNp->starttime.tv_sec;
 		
-		fprintf(stdout, "Finished at %ld, runtime duration %f\n", curNp->finishtime.tv_sec, elapsed);
+		fprintf(stdout, "Finished child %d pid of parent %d\n", pid, getpid());
+		fprintf(stdout, "Finished at %ld, runtime duration %.1f\n", curNp->finishtime.tv_sec, elapsed);
 		fflush(STDIN_FILENO);
 		
 		if (elapsed <= 2) {
@@ -281,11 +304,11 @@ int main(void) {
 	 		pid = fork();
 	 		
 	 		if (pid < 0) { // if fork() fails
-	 			fprintf(stderr, "Failed to fork");
+	 			fprintf(stderr, "Failed to fork\n");
 	 			exit(2);
 	 		} else if (pid == 0) { // child process
 	 			redirectOutputToFiles(getpid());
-	 			printf("RESTARTING");
+	 			printf("RESTARTING\n");
 	 			printf("Starting command %d: child %d pid of parent %d\n", curNp->index, getpid(), getppid());
 	 			
 	 			// clean buffer. Without this, the [pid].out will be overwritten by the execvp result
@@ -305,18 +328,21 @@ int main(void) {
 	 			
 	 			// execute the command using execvp
 	 			if (execvp(arg[0], arg) < 0) {
-	 				perror("Failed execvp");
+	 				perror("Failed execvp\n");
 	 				exit(2);
 	 			}
 	 			
 	 		} else if (pid > 0) {  /* parent goes to the next node */ 
 	 			curNp = insert(curNp->command, pid, curNp->index);
 	 			if (np == NULL) {
-	 				perror("Failed to inserting new node");
+	 				perror("Failed to inserting new node\n");
 	 			}
 	 			curNp->starttime = starttime;
 			}
 		}
+		
  	}
+ 	
+ 	freeHashTable();
 	return 0;
 }
