@@ -1,0 +1,20 @@
+ 1273  cd '/home/kimlong12/apue.3e' 
+ 1274  rsync -arv filedir/ filedir1/
+ 1275  cp -r filedir/ filedir2/
+ 1276  ls -latr filedir1/
+ 1277  ls -latr filedir2/
+ 1278  cd filedir1
+ 1279  du access.c 
+ 1280  du -h changmod.c
+ 1281  du -h changemod.c 
+ 1282  locate devrdev.c 
+ 1283  sudo apt install plocate
+ 1284  locate devrdev.c 
+ 1285  rm ftw8.c
+ 1286  df
+ 1287  df access.c 
+ 1288  du access.c 
+ 1289  stat changemod.c 
+ 1290  history > worksheet.log
+ 
+ Answer: The only difference I notice is the directory using rsync has original timestamps while the directory using cp has the timestamps that the files were created.
