@@ -1,8 +1,8 @@
 /**
- * Description:
+ * Description: This programs takes 2 input files containing names as an argument, counts them in 2 different thread, and output the result.
  * Author names: Kimlong Hor, Jimmy Phan
  * Author emails: kimlong.hor@sjsu.edu, jimmy.phan@sjsu.edu
- * Last modified date: 05/07/2023
+ * Last modified date: 05/10/2023
  * Creation date: 05/07/2023
  **/
 
@@ -11,6 +11,8 @@
 #include <string.h>
 #include <pthread.h>
 #include <stdbool.h>
+#include <time.h>
+#include <unistd.h>
 
 pthread_mutex_t tlock1 = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t tlock2 = PTHREAD_MUTEX_INITIALIZER;
@@ -45,7 +47,8 @@ typedef struct NAME_NODE {
 	struct NAME_NODE *next;
 } NAME_NODE;
 
-NAME_NODE* head = NULL;
+static NAME_NODE* head = NULL;
+static char* curDateAndTime = NULL;
 
 /*
  This function frees the allocated memory for a linkedlist
@@ -62,8 +65,6 @@ void freeLinkedList(NAME_NODE* head) {
 		free(current);
 		current = next;
 	}
-	
-	free(head);
 }
 
 /*
@@ -86,7 +87,9 @@ void PrintNodes(NAME_NODE *head) {
 // function main
 *********************************************************/
 int main(int argc, char** argv) {
-
+	
+	printf("======================= Log Messages =======================\n");
+	
 	// check the number of files
 	if(argc != 3) {
 		perror("You must enter two input files.\n");
@@ -94,28 +97,54 @@ int main(int argc, char** argv) {
 	}
 
 	head = (NAME_NODE*) calloc(1, sizeof(NAME_NODE));
+	curDateAndTime = (char*) malloc(100);
 	
-	printf("create first thread\n");
+	printf("Create first thread\n");
 	pthread_create(&tid1,NULL,thread_runner, argv[1]);
 	
-	printf("create second thread\n");
+	printf("Create second thread\n");
 	pthread_create(&tid2,NULL,thread_runner, argv[2]);
 	
-	printf("wait for first thread to exit\n");
+	//printf("wait for first thread to exit\n");
 	pthread_join(tid1,NULL);
-	printf("first thread exited\n");
+	printf("First thread exited\n");
 	
-	printf("wait for second thread to exit\n");
+	//printf("wait for second thread to exit\n");
 	pthread_join(tid2,NULL);
-	printf("second thread exited\n");
+	printf("Second thread exited\n");
 	
-	//TODO print out the sum variable with the sum of all the numbers
-	PrintNodes(head);
+	//print out the sum variable with the sum of all the numbers
+	printf("======================= Name counts =======================\n");
+	PrintNodes(head->next);
 	
-	//freeLinkedList(list);
-	
+	freeLinkedList(head);
+	free(curDateAndTime);
 	exit(0);
 }
+
+/**********************************************************************
+// function getCurrentDateAndTime gets current date and time
+**********************************************************************/
+void getCurrentDateAndTime(char* curDateAndTime) {
+	time_t t = time(NULL);
+	struct tm *localTime = localtime(&t);
+	
+	int year, month, day, hour, minute, second;
+	year = localTime->tm_year + 1900;
+	month = localTime->tm_mon + 1;
+	day = localTime->tm_mday;
+	hour = localTime->tm_hour;
+	minute = localTime->tm_min;
+	second = localTime->tm_sec;
+	
+	if (hour < 12) {
+		sprintf(curDateAndTime, "%02d/%02d/%d %02d:%02d:%02d am: ", month, day, year, hour, minute, second);
+	} else if (hour == 12) {
+		sprintf(curDateAndTime, "%02d/%02d/%d %02d:%02d:%02d pm: ", month, day, year, hour, minute, second);
+	} else {
+		sprintf(curDateAndTime, "%02d/%02d/%d %02d:%02d:%02d pm: ", month, day, year, hour - 12, minute, second);
+	}
+} 
 
 /**********************************************************************
 // function thread_runner runs inside each thread
@@ -124,7 +153,7 @@ void* thread_runner(void* filename) {
 	pthread_t me;
 	me = pthread_self();
 	
-	printf("This is thread %ld (p=%p)\n",me,p);
+	//printf("This is thread %ld (p=%p)\n",me,p);
 	pthread_mutex_lock(&tlock2); // critical section starts (p)
 	
 	if (p==NULL) {
@@ -133,26 +162,30 @@ void* thread_runner(void* filename) {
 	}
 	pthread_mutex_unlock(&tlock2); // critical section ends (p)
 	
+	getCurrentDateAndTime(curDateAndTime);
 	pthread_mutex_lock(&tlock1); // critical section starts (logindex)
 	logindex++;
 	if (p!=NULL && p->creator==me) {
-		printf("Logindex %d, This is thread %ld and I created THREADDATA %p\n",logindex, me,p);
+		printf("Logindex %d, thread %ld, PID %d, %s This is thread %ld and I created THREADDATA %p\n", logindex, me, getpid(), curDateAndTime, me, p);
 	} else {
-		printf("Logindex %d, This is thread %ld and I can access the THREADDATA %p\n",logindex, me,p);
+		printf("Logindex %d, thread %ld, PID %d, %s This is thread %ld and I can access the THREADDATA %p\n", logindex, me, getpid(), curDateAndTime, me, p);
 	}
 	pthread_mutex_unlock(&tlock1); // critical section ends (logindex)
 	
 	
+	getCurrentDateAndTime(curDateAndTime);
 	FILE *fp = fopen((char*) filename, "r");
 	if (fp == NULL) { // fail
 		pthread_mutex_lock(&tlock1); // critical section starts (logindex)
 		logindex++;
- 		fprintf(stderr, "Logindex %d, range: cannot open file: %s\n", logindex, (char*) filename);
+		printf("Logindex %d, thread %ld, PID %d, %s range: cannot open file: %s\n", logindex, me, getpid(), curDateAndTime, (char*) filename);
+		
  		pthread_mutex_unlock(&tlock1); // critical section ends (logindex)
  	} else { // success
  		pthread_mutex_lock(&tlock1); // critical section starts (logindex)
  		logindex++;
- 		printf("Logindex %d, opened file: %s successfully.\n", logindex, (char*) filename);
+ 		printf("Logindex %d, thread %ld, PID %d, %s opened file: %s successfully.\n", logindex, me, getpid(), curDateAndTime, (char*) filename);
+		
  		pthread_mutex_unlock(&tlock1); // critical section ends (logindex)
  		
  		char* input = NULL;
@@ -198,7 +231,7 @@ void* thread_runner(void* filename) {
 	 			name.count = 1;
 	 			NAME_NODE* newNode = (NAME_NODE*) calloc(1, sizeof(NAME_NODE));
 	 			
-	 			
+	
 	 			pthread_mutex_lock(&tlock3); // critical section starts (linekdlist)
 	 			newNode->name_count = name;
 	 			newNode->next = head->next;
@@ -208,36 +241,31 @@ void* thread_runner(void* filename) {
 	 		
 		}
 		
-		free(input);
 		fclose(fp);
  	}
+ 	
+ 	pthread_mutex_lock(&tlock1); // critical section starts (logindex)
+	logindex++;
+	pthread_mutex_unlock(&tlock1); // critical section ends (logindex)
 	
+	getCurrentDateAndTime(curDateAndTime);
 	pthread_mutex_lock(&tlock2); // critical section starts (p)
 	if (p!=NULL && p->creator==me) {
-		pthread_mutex_unlock(&tlock2); // critical section ends (p)
 		
-		pthread_mutex_lock(&tlock1); // critical section starts (logindex)
-		logindex++;
-		printf("Logindex %d, This is thread %ld and I delete THREADDATA\n",logindex, me);
-		pthread_mutex_unlock(&tlock1); // critical section ends (logindex)
+		printf("Logindex %d, thread %ld, PID %d, %s This is thread %ld and I delete THREADDATA\n", logindex, me, getpid(), curDateAndTime, me);
 
 		/**
-		* TODO Free the THREADATA object.
+		* Free the THREADATA object.
 		* Freeing should be done by the same thread that created it.
 		* See how the THREADDATA was created for an example of how this is done.
 		*/
-		pthread_mutex_lock(&tlock2); // critical section starts (p)
-		free((void*)p);
+		free(p);
 		p = NULL;
-		pthread_mutex_unlock(&tlock2); // critical section ends (p)
 	} else {
-		pthread_mutex_unlock(&tlock2); // critical section ends (p)
-		pthread_mutex_lock(&tlock1); // critical section starts (logindex)
-		logindex++;
-		printf("Logindex %d, This is thread %ld and I can access the THREADDATA\n", logindex, me);
-		pthread_mutex_unlock(&tlock1); // critical section ends (logindex)
+		printf("Logindex %d, thread %ld, PID %d, %s This is thread %ld and I can access the THREADDATA\n", logindex, me, getpid(), curDateAndTime, me);
 	}
-	
+	pthread_mutex_unlock(&tlock2);
+
 	pthread_exit(NULL);
 	return NULL;
 }//end thread_runner
