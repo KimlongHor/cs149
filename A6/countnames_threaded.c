@@ -45,35 +45,16 @@ typedef struct NAME_NODE {
 	struct NAME_NODE *next;
 } NAME_NODE;
 
-// Define linkedlist struct
-typedef struct LinkedList {
-	NAME_NODE *head;
-} LinkedList;
-
-/*
- This function allocates memory for a new linkedlist
- Assumption: None
- Inputs: None
- Return: a linkedlist pointer
- */
-LinkedList* initLinkedList() {
-	LinkedList* list = malloc(sizeof(LinkedList));
-	list->head = NULL;
-	return list;
-}
-
-//LinkedList* list = NULL;
-
 NAME_NODE* head = NULL;
 
 /*
  This function frees the allocated memory for a linkedlist
  Assumption: None
- Inputs: a linkedlist pointer
+ Inputs: a node pointer
  Return: void
  */
-void freeLinkedList(LinkedList* list) {
-	NAME_NODE* current = list->head;
+void freeLinkedList(NAME_NODE* head) {
+	NAME_NODE* current = head;
 	NAME_NODE* next = NULL;
 	
 	while(current != NULL) {
@@ -82,7 +63,7 @@ void freeLinkedList(LinkedList* list) {
 		current = next;
 	}
 	
-	free(list);
+	free(head);
 }
 
 /*
@@ -111,7 +92,7 @@ int main(int argc, char** argv) {
 		perror("You must enter two input files.\n");
 		exit(1);
 	}
-	//list = initLinkedList();
+
 	head = (NAME_NODE*) calloc(1, sizeof(NAME_NODE));
 	
 	printf("create first thread\n");
@@ -195,19 +176,18 @@ void* thread_runner(void* filename) {
 	 			input[strlen(input) - 1] = '\0';
 	 		}
 	 		
-	 		//NAME_NODE* curNode = list->head;
 	 		NAME_NODE* curNode = head;
 	 		
 	 		
 	 		pthread_mutex_lock(&tlock3); // critical section starts (linkedlist)
-	 		while((curNode = curNode->next) != NULL) {
+	 		while(curNode != NULL) {
 	 			// if name exists, update the counter and break.
 	 			if (strcmp(curNode->name_count.name, input) == 0) {
 	 				isExisted = true;
 	 				curNode->name_count.count += 1;
 	 				break;
 	 			}
-	 			//curNode = curNode->next;
+	 			curNode = curNode->next;
 	 		}
 	 		pthread_mutex_unlock(&tlock3); // critical section ends (linkedlist)
 	 		
@@ -223,9 +203,6 @@ void* thread_runner(void* filename) {
 	 			newNode->name_count = name;
 	 			newNode->next = head->next;
 	 			head->next = newNode;
-	 			//NAME_NODE* temp = list->head;
-	 			//newNode->next = temp->next;
-	 			//temp->next = newNode;
 	 			pthread_mutex_unlock(&tlock3); // critical section ends (linkedlist)
 	 		}
 	 		
